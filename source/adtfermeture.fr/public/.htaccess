@@ -1,0 +1,15 @@
+# Site vitrine ADTF – application monopage (Vite/React) sur Apache/LiteSpeed (Hostinger)
+Options -MultiViews
+RewriteEngine On
+
+# Forcer HTTPS
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Fichiers et dossiers existants servis tels quels
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Tout le reste (ex. /admin) renvoie vers index.html
+RewriteRule ^ index.html [L]

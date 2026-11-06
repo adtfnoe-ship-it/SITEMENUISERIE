@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800&family=Great+Vibes&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans text-slate-700 antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  /* Primary CTA — brand blue */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 bg-brand-blue hover:bg-brand-blue-light text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+  }
+
+  /* Outline — used on dark/colored backgrounds */
+  .btn-outline {
+    @apply inline-flex items-center gap-2 border-2 border-white text-white hover:bg-white hover:text-brand-blue-dark font-semibold px-6 py-3 rounded-lg transition-all duration-200;
+  }
+
+  /* Secondary — white button */
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-brand-blue-dark font-semibold px-6 py-3 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+  }
+
+  .section-title {
+    @apply font-display text-2xl sm:text-3xl md:text-4xl font-bold text-brand-blue-dark leading-tight;
+  }
+
+  .section-subtitle {
+    @apply text-slate-500 text-base md:text-lg leading-relaxed mt-4;
+  }
+
+  /* Eyebrow label with green accent */
+  .eyebrow {
+    @apply text-brand-green font-semibold text-sm uppercase tracking-widest flex items-center gap-1.5;
+  }
+
+  /* Green separator bar */
+  .eyebrow-bar {
+    @apply w-8 h-0.5 bg-brand-green;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-slate-100;
+  }
+
+  .form-label {
+    @apply block text-sm font-semibold text-brand-blue-dark mb-1.5;
+  }
+
+  .form-input {
+    @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent transition-all duration-200 text-sm;
+  }
+
+  .form-input-error {
+    @apply border-red-400 focus:ring-red-400;
+  }
+
+  /* Green-framed icon chip (charter: white icon on green bg) */
+  .icon-chip {
+    @apply w-11 h-11 bg-brand-green rounded-xl flex items-center justify-center shrink-0;
+  }
+
+  /* Section with green left border */
+  .green-border-left {
+    @apply border-l-4 border-brand-green pl-5;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
