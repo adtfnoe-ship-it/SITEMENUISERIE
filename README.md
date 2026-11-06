@@ -36,3 +36,7 @@ L'administration (`https://adtfermeture.fr/admin`) permet de :
 Les photos sont réduites dans le navigateur avant l'envoi (2000 px max, WebP) et stockées dans le
 bucket Supabase `site-images`. Les photos remplacées sont des lignes de `gallery_images` avec
 `section = 'emplacement'` et `label` = clé de l'emplacement : aucune table supplémentaire.
+
+Installation de la base (une fois) : exécuter
+`source/adtfermeture.fr/supabase/migrations/20261106090000_installation_admin_vitrine.sql`
+dans Supabase → SQL Editor. Seuls les e-mails listés dans `est_admin_vitrine()` peuvent modifier le site.
