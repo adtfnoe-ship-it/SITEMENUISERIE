@@ -1,5 +1,19 @@
 # Serveur web du VPS ADTF (Caddy) : HTTPS automatique (Let's Encrypt).
 # Ce fichier est relu automatiquement quand il change sur la branche déployée.
+{
+	# Certificat obtenu à la première connexion sur le VPS : pas de coupure
+	# au moment où un domaine est basculé vers le VPS dans les DNS.
+	on_demand_tls {
+		ask http://localhost:5555/autorise
+	}
+}
+
+# Liste des domaines autorisés à recevoir un certificat (interne au conteneur).
+http://localhost:5555 {
+	@autorise query domain=adtfermeture.fr domain=www.adtfermeture.fr domain=vps.adtfermeture.fr domain=devis-adtf.fr domain=www.devis-adtf.fr domain=vps.devis-adtf.fr
+	respond @autorise 200
+	respond 404
+}
 
 (securite) {
 	encode zstd gzip
@@ -39,13 +53,19 @@
 	}
 }
 
-# Adresses de test du VPS (ne servent qu'à vérifier avant une bascule).
-vps.adtfermeture.fr {
+# vps.* : adresses de test, toujours dirigées vers le VPS.
+adtfermeture.fr, www.adtfermeture.fr, vps.adtfermeture.fr {
+	tls {
+		on_demand
+	}
 	root * /srv/current/sites/adtfermeture.fr
 	import spa
 }
 
-vps.devis-adtf.fr {
+devis-adtf.fr, www.devis-adtf.fr, vps.devis-adtf.fr {
+	tls {
+		on_demand
+	}
 	root * /srv/current/sites/devis-adtf.fr
 	import spa
 }

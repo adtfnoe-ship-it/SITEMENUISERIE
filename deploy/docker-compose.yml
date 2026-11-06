@@ -11,10 +11,11 @@ services:
   sync:
     image: alpine:3.20
     restart: unless-stopped
+    # Valeurs en clair : le Docker Manager Hostinger refuse la syntaxe ${VAR:-défaut}.
     environment:
-      REPO_URL: ${REPO_URL:-https://github.com/adtfnoe-ship-it/sitemenuiserie.git}
-      BRANCH: ${BRANCH:-claude/jolly-gauss-efyqd3}
-      INTERVAL: ${INTERVAL:-60}
+      REPO_URL: https://github.com/adtfnoe-ship-it/sitemenuiserie.git
+      BRANCH: claude/jolly-gauss-efyqd3
+      INTERVAL: "60"
     volumes:
       - site:/srv
     entrypoint: ["/bin/sh", "-c"]
