@@ -1,0 +1,68 @@
+# Projet Docker « adtf-web » du VPS (déployé via le Docker Manager / l'API Hostinger).
+#
+# - sync  : récupère la branche BRANCH du dépôt GitHub toutes les INTERVAL secondes
+#           et bascule /srv/current sur la nouvelle version (lien symbolique).
+# - caddy : sert les sites de /srv/current/sites avec HTTPS automatique et relit
+#           /srv/current/deploy/Caddyfile dès qu'il change.
+#
+# Mettre un site à jour = pousser sur la branche ; rien à faire sur le VPS.
+
+services:
+  sync:
+    image: alpine:3.20
+    restart: unless-stopped
+    environment:
+      REPO_URL: ${REPO_URL:-https://github.com/adtfnoe-ship-it/sitemenuiserie.git}
+      BRANCH: ${BRANCH:-claude/jolly-gauss-efyqd3}
+      INTERVAL: ${INTERVAL:-60}
+    volumes:
+      - site:/srv
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -u
+        until apk add --no-cache git >/dev/null; do sleep 10; done
+        mkdir -p /srv/releases
+        while true; do
+          SHA=$$(git ls-remote "$$REPO_URL" "refs/heads/$$BRANCH" | cut -f1)
+          CUR=$$(cat /srv/current.sha 2>/dev/null || true)
+          if [ -n "$$SHA" ] && [ "$$SHA" != "$$CUR" ]; then
+            DIR=/srv/releases/$$SHA
+            rm -rf "$$DIR"
+            if git clone -q --depth 1 --branch "$$BRANCH" "$$REPO_URL" "$$DIR" \
+              && [ -f "$$DIR/deploy/Caddyfile" ]; then
+              ln -sfn "releases/$$SHA" /srv/current
+              echo "$$SHA" > /srv/current.sha
+              echo "Version $$SHA en ligne"
+              ls -1t /srv/releases | tail -n +4 | while read -r OLD; do rm -rf "/srv/releases/$$OLD"; done
+            else
+              echo "Echec de la recuperation de $$SHA, version actuelle conservee"
+              rm -rf "$$DIR"
+            fi
+          fi
+          sleep "$$INTERVAL"
+        done
+
+  caddy:
+    image: caddy:2.8.4-alpine
+    restart: unless-stopped
+    depends_on:
+      - sync
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - site:/srv:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        until [ -f /srv/current/deploy/Caddyfile ]; do echo "En attente du site..."; sleep 3; done
+        exec caddy run --config /srv/current/deploy/Caddyfile --adapter caddyfile --watch
+
+volumes:
+  site:
+  caddy_data:
+  caddy_config:

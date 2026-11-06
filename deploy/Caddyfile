@@ -1,0 +1,51 @@
+# Serveur web du VPS ADTF (Caddy) : HTTPS automatique (Let's Encrypt).
+# Ce fichier est relu automatiquement quand il change sur la branche déployée.
+
+(securite) {
+	encode zstd gzip
+	header {
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+}
+
+# Application monopage (Vite/React) :
+# - fichiers versionnés de /assets : cache long ;
+# - images : cache d'un jour ;
+# - index.html et toutes les routes de l'application : jamais en cache,
+#   pour que chaque mise à jour soit vue immédiatement.
+(spa) {
+	import securite
+
+	@versionnes path /assets/*
+	header @versionnes Cache-Control "public, max-age=31536000, immutable"
+
+	@images path *.png *.jpg *.jpeg *.webp *.svg *.ico *.gif
+	header @images Cache-Control "public, max-age=86400"
+
+	@pages not path /assets/* *.png *.jpg *.jpeg *.webp *.svg *.ico *.gif *.woff *.woff2
+	header @pages Cache-Control "no-cache, no-store, must-revalidate"
+
+	# Un fichier de /assets absent doit renvoyer 404, pas la page d'accueil.
+	handle /assets/* {
+		file_server
+	}
+	handle {
+		try_files {path} /index.html
+		file_server {
+			hide .htaccess _redirects README.md
+		}
+	}
+}
+
+# Adresses de test du VPS (ne servent qu'à vérifier avant une bascule).
+vps.adtfermeture.fr {
+	root * /srv/current/sites/adtfermeture.fr
+	import spa
+}
+
+vps.devis-adtf.fr {
+	root * /srv/current/sites/devis-adtf.fr
+	import spa
+}
